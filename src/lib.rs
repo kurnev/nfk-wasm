@@ -26,7 +26,7 @@ impl GlobalState {
 
     pub fn new() -> GlobalState {
         let mut state = [0 as u32; 8000];
-        let blocks = &mut state[0..2000];
+        let blocks = &mut state[0..4000];
         map::allocate_map(blocks);
 
         GlobalState { state }
@@ -35,7 +35,6 @@ impl GlobalState {
     pub fn blocks_ptr(&self) -> *const u32 {
         self.state[0..8000].as_ptr()
     }
-
 
     pub fn spawn_hero(&mut self) {
         let hero = hero::Hero::new();
@@ -46,7 +45,6 @@ impl GlobalState {
         self.state[2003] = hero_position.width;
         self.state[2004] = hero_position.height;
     }
-
 }
 
 //fn main() {

@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct Rectangle {
     pub x: u32, // left-top, same in DOM canvas
-    pub y: u32, 
+    pub y: u32,
     pub width: u32,
     pub height: u32,
 }
@@ -12,7 +12,7 @@ impl Rectangle {
             x,
             y,
             width,
-            height
+            height,
         }
     }
 }
@@ -26,3 +26,4 @@ impl Geometry for Rectangle {
         self.width * self.height
     }
 }
+

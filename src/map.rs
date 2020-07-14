@@ -8,7 +8,6 @@ use std::convert::TryInto;
 use std::error::Error;
 use std::fmt;
 
-
 type Rectangle = geometry::Rectangle;
 
 impl Error for SpawnObjectError {}
@@ -27,7 +26,6 @@ pub struct Map<'a> {
     blocks: &'a [u32],
 }
 
-
 pub fn allocate_map(blocks: &mut [u32]) {
     const TILE_WIDTH: u32 = 30;
     const TILE_HEIGHT: u32 = 20;
@@ -45,15 +43,17 @@ pub fn allocate_map(blocks: &mut [u32]) {
             let column_id: u32 = column_id.try_into().unwrap();
             // 1 - there is a block
             // 0 - there is an empty space
-            let cell_id: usize = (row_id * TILES_ON_WIDTH + column_id).try_into().unwrap();
+            let cell_id: usize = ((row_id * TILES_ON_WIDTH + column_id) * 4)
+                .try_into()
+                .unwrap();
+            //web_sys::console::log_1(
+            //&format!("{:?} {:?} {:?} {:?}", row_id, column_id, cell_id, column).into(),
+            //);
             if column.eq(&1) {
-                // x and y
                 blocks[cell_id] = TILE_WIDTH * column_id;
                 blocks[cell_id + 1] = TILE_HEIGHT * row_id;
-                // width and height
                 blocks[cell_id + 2] = TILE_WIDTH;
                 blocks[cell_id + 3] = TILE_HEIGHT;
-                web_sys::console::log_1(&format!("HOPA {:?} {:?}", TILE_WIDTH, cell_id).into());
             }
         }
     }
@@ -63,9 +63,7 @@ pub fn does_collide_with_map(blocks: &[u32], rect: &Rectangle) -> bool {
     let end_x = rect.x + rect.width;
     let end_y = rect.y + rect.height;
 
-    if is_point_outside_of_map(&rect.x, &rect.y)
-        || is_point_outside_of_map(&end_x, &end_y)
-    {
+    if is_point_outside_of_map(&rect.x, &rect.y) || is_point_outside_of_map(&end_x, &end_y) {
         return true;
     }
 
@@ -108,7 +106,7 @@ pub fn spawn_hero(blocks: &[u32], hero: &hero::Hero) -> Result<Rectangle, SpawnO
                 y: rect.y,
                 width: rect.width,
                 height: rect.height,
-            })
+            });
         }
         Err(error) => {
             panic!("Could not spawn hero on map {}", error);
