@@ -20,8 +20,8 @@ impl GlobalState {
     pub fn tick(&mut self) {
         // One tick of universe
         // Get every movable object and apply force to it
-        self.state[2001] += 1;
-        self.state[2002] += 1
+        self.state[4001] += 1;
+        self.state[4002] += 1
     }
 
     pub fn new() -> GlobalState {
@@ -38,12 +38,12 @@ impl GlobalState {
 
     pub fn spawn_hero(&mut self) {
         let hero = hero::Hero::new();
-        let hero_position = map::spawn_hero(&self.state[0..2000], &hero).unwrap();
+        let hero_position = map::spawn_hero(&self.state[0..4000], &hero).unwrap();
 
-        self.state[2001] = hero_position.x;
-        self.state[2002] = hero_position.y;
-        self.state[2003] = hero_position.width;
-        self.state[2004] = hero_position.height;
+        self.state[4001] = hero_position.x;
+        self.state[4002] = hero_position.y;
+        self.state[4003] = hero_position.width;
+        self.state[4004] = hero_position.height;
     }
 }
 
