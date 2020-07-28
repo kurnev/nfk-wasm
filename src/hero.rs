@@ -10,7 +10,7 @@ pub struct Hero {
 impl Hero {
     pub fn new() -> Hero {
         Hero {
-            position: geometry::Rectangle::new(0, 0, 20, 90),
+            position: geometry::Rectangle::new(0, 0, 30, 90),
             applied_forces: vec![DirectionalForce {
                 force: 1.0,
                 angle: PI / 2.0,

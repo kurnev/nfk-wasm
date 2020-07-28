@@ -5,35 +5,56 @@ import { GlobalState } from "nfk-wasm";
 const state = GlobalState.new();
 state.spawn_hero();
 
-const canvas = document.getElementById("map");
-var ctx = canvas.getContext("2d");
+const canvasMap = document.getElementById("map");
+const ctxMap = canvasMap.getContext("2d");
+const canvasHero = document.getElementById("hero_1");
+const ctxHero = canvasHero.getContext("2d");
 
+ctxHero.fillStyle = "red";
+
+state.spawn_hero();
 const renderLoop = () => {
   state.tick();
   draw();
+  drawHero();
   requestAnimationFrame(renderLoop);
 };
 
-ctx.fillStyle = getRandomColor();
-const oldColor = ctx.fillStyle;
+ctxMap.fillStyle = getRandomColor();
+const oldColor = ctxMap.fillStyle;
 
 const draw = () => {
   const ptr = state.blocks_ptr();
-  const cells = new Uint32Array(memory.buffer, ptr, 8000);
+  const cells = new Uint32Array(memory.buffer, ptr, 4000);
 
-  ctx.beginPath();
+  ctxMap.beginPath();
+
   for (let i = 0; i < cells.length; i += 4) {
     if (cells[i + 2] && cells[i + 3]) {
+      ctxMap.fillRect(cells[i], cells[i + 1], cells[i + 2], cells[i + 3]);
       if (i === 4000) {
-        ctx.fillStyle = "red";
-      }
-      ctx.fillRect(cells[i], cells[i + 1], cells[i + 2], cells[i + 3]);
-      if (i === 4000) {
-        ctx.fillStyle = oldColor;
+        ctxMap.fillStyle = oldColor;
       }
     }
   }
-  ctx.stroke();
+  ctxMap.stroke();
+};
+
+const drawHero = () => {
+  const ptr = state.heroes_ptr();
+  const cells = new Uint32Array(memory.buffer, ptr, 4000);
+
+  // clean prevois frame
+  ctxHero.clearRect(0, 0, canvasHero.width, canvasHero.height);
+
+  ctxHero.beginPath();
+
+  for (let i = 0; i < cells.length; i += 4) {
+    if (cells[i + 2] && cells[i + 3]) {
+      ctxHero.fillRect(cells[i], cells[i + 1], cells[i + 2], cells[i + 3]);
+    }
+  }
+  ctxHero.stroke();
 };
 
 function getRandomColor() {

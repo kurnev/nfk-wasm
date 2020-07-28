@@ -3,7 +3,6 @@ extern crate web_sys;
 use crate::default_map;
 use crate::geometry;
 use crate::hero;
-use rand::prelude::*;
 use std::convert::TryInto;
 use std::error::Error;
 use std::fmt;
@@ -137,14 +136,24 @@ fn find_space_for_rectangle(
     // Randomly iterate over all tiles and see if it can fit somewhere
 
     let iter_steps = blocks.len() / 4;
-
-    let all_block_ids = vec![0..iter_steps];
-    let mut used_blocks = Vec::with_capacity(all_block_ids.len());
+    let mut used_blocks = Vec::with_capacity(iter_steps);
 
     loop {
-        let random_tile: usize = rand::thread_rng().gen_range(0, iter_steps + 1);
+        let random_tile =
+            js_sys::Math::floor(js_sys::Math::random() * (iter_steps as f64)) as usize;
 
-        if used_blocks.len() == all_block_ids.len() {
+        web_sys::console::log_1(
+            &format!(
+                "{:?} {:?} {:?} {:?}",
+                iter_steps,
+                random_tile,
+                used_blocks.len(),
+                iter_steps
+            )
+            .into(),
+        );
+
+        if used_blocks.len() == iter_steps {
             // we have tried every possible position above
             // tiles and could not fit the rect
             return Err(SpawnObjectError {});
@@ -164,7 +173,7 @@ fn find_space_for_rectangle(
             height: rect.height,
         };
 
-        if does_collide_with_map(blocks, &position_rect_above_tile) {
+        if !does_collide_with_map(blocks, &position_rect_above_tile) {
             return Ok(position_rect_above_tile);
         } else {
             continue;
