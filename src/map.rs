@@ -68,14 +68,28 @@ pub fn does_collide_with_map(blocks: &[u32], rect: &Rectangle) -> bool {
 
     // each rectangle is held in 4 bytes
     let iter_steps = blocks.len() / 4;
+    let mut n = 0;
 
-    for n in 0..iter_steps {
+    for i in 0..iter_steps {
+        n = i * 4;
+        web_sys::console::log_1(
+            &format!(
+                "{:?}",
+                &Rectangle {
+                    x: blocks[n],
+                    y: blocks[n + 1],
+                    width: blocks[n + 2],
+                    height: blocks[n + 3],
+                }
+            )
+            .into(),
+        );
         if is_point_inside_tile(
             &Rectangle {
                 x: blocks[n],
                 y: blocks[n + 1],
                 width: blocks[n + 2],
-                height: blocks[n + 4],
+                height: blocks[n + 3],
             },
             &rect.x,
             &rect.y,
@@ -84,7 +98,7 @@ pub fn does_collide_with_map(blocks: &[u32], rect: &Rectangle) -> bool {
                 x: blocks[n],
                 y: blocks[n + 1],
                 width: blocks[n + 2],
-                height: blocks[n + 4],
+                height: blocks[n + 3],
             },
             &end_x,
             &end_y,
@@ -99,7 +113,6 @@ pub fn does_collide_with_map(blocks: &[u32], rect: &Rectangle) -> bool {
 pub fn spawn_hero(blocks: &[u32], hero: &hero::Hero) -> Result<Rectangle, SpawnObjectError> {
     match find_space_for_rectangle(blocks, &hero.position) {
         Ok(rect) => {
-            println!("Found space: {:?} {:?}", rect.x, rect.y);
             return Ok(Rectangle {
                 x: rect.x,
                 y: rect.y,
@@ -114,16 +127,25 @@ pub fn spawn_hero(blocks: &[u32], hero: &hero::Hero) -> Result<Rectangle, SpawnO
 }
 
 fn is_point_inside_tile(source_rect: &Rectangle, x: &u32, y: &u32) -> bool {
+    if source_rect.width == 0 || source_rect.height == 0 {
+        return false;
+    }
+
+    if source_rect.y > 560 {
+        web_sys::console::log_1(&format!("{:?} {:?} {:?}", source_rect, x, y).into());
+    }
+
     let end_x = source_rect.x + source_rect.width;
     let end_y = source_rect.y + source_rect.height;
-    if x >= &source_rect.x && x <= &end_x && y <= &source_rect.y && y >= &end_y {
+
+    if x >= &source_rect.x && x <= &end_x && y >= &source_rect.y && y <= &end_y {
         return true;
     }
     false
 }
 
 fn is_point_outside_of_map(x: &u32, y: &u32) -> bool {
-    const MAP_WIDTH: u32 = 600; // in px
+    const MAP_WIDTH: u32 = 600;
     const MAP_HEIGHT: u32 = 600;
     x > &MAP_WIDTH || y > &MAP_HEIGHT
 }
@@ -134,24 +156,12 @@ fn find_space_for_rectangle(
 ) -> Result<Rectangle, SpawnObjectError> {
     // Looks for tile that has enough space to fit rectangle above it
     // Randomly iterate over all tiles and see if it can fit somewhere
-
     let iter_steps = blocks.len() / 4;
     let mut used_blocks = Vec::with_capacity(iter_steps);
 
     loop {
         let random_tile =
             js_sys::Math::floor(js_sys::Math::random() * (iter_steps as f64)) as usize;
-
-        web_sys::console::log_1(
-            &format!(
-                "{:?} {:?} {:?} {:?}",
-                iter_steps,
-                random_tile,
-                used_blocks.len(),
-                iter_steps
-            )
-            .into(),
-        );
 
         if used_blocks.len() == iter_steps {
             // we have tried every possible position above
@@ -166,9 +176,15 @@ fn find_space_for_rectangle(
 
         used_blocks.push(random_tile);
 
+        if blocks[random_tile + 1] < rect.height + 10 {
+            continue;
+        }
+
+        let y = blocks[random_tile + 1] - rect.height - 10;
+
         let position_rect_above_tile = Rectangle {
-            x: rect.x,
-            y: rect.y + blocks[random_tile + 1],
+            x: blocks[random_tile],
+            y,
             width: rect.width,
             height: rect.height,
         };

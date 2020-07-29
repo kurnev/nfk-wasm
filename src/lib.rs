@@ -20,19 +20,32 @@ impl GlobalState {
     pub fn tick(&mut self) {
         // One tick of universe
         // Get every movable object and apply force to it
+        let random_x = js_sys::Math::floor(js_sys::Math::random() * 4.0) as u32;
+        let random_y = js_sys::Math::floor(js_sys::Math::random() * 4.0) as u32;
+
+        let sign = js_sys::Math::random() > 0.65;
+
+        let mut x = self.state[4000] + random_x;
+        let mut y = self.state[4001] + random_y;
+
+        if !sign {
+            x = self.state[4000] - random_x;
+            y = self.state[4001] - random_y;
+        }
 
         let does_collide = map::does_collide_with_map(
             &self.state[0..4000],
             &geometry::Rectangle {
-                x: self.state[4000],
-                y: self.state[4001],
+                x,
+                y,
                 width: self.state[4002],
                 height: self.state[4003],
             },
         );
+
         if !does_collide {
-            self.state[4000] += js_sys::Math::floor(js_sys::Math::random() * 5.0) as u32;
-            self.state[4001] += js_sys::Math::floor(js_sys::Math::random() * 5.0) as u32;
+            self.state[4000] = x;
+            self.state[4001] = y;
         }
     }
 

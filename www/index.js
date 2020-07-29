@@ -12,7 +12,6 @@ const ctxHero = canvasHero.getContext("2d");
 
 ctxHero.fillStyle = "red";
 
-state.spawn_hero();
 const renderLoop = () => {
   state.tick();
   draw();
@@ -48,12 +47,9 @@ const drawHero = () => {
   ctxHero.clearRect(0, 0, canvasHero.width, canvasHero.height);
 
   ctxHero.beginPath();
+  const i = 0;
 
-  for (let i = 0; i < cells.length; i += 4) {
-    if (cells[i + 2] && cells[i + 3]) {
-      ctxHero.fillRect(cells[i], cells[i + 1], cells[i + 2], cells[i + 3]);
-    }
-  }
+  ctxHero.fillRect(cells[i], cells[i + 1], cells[i + 2], cells[i + 3]);
   ctxHero.stroke();
 };
 
