@@ -5,6 +5,7 @@ mod default_map;
 mod geometry;
 mod hero;
 mod map;
+mod physics;
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
